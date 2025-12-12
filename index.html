@@ -3,195 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Công Nghệ AI - Khám phá Tương lai</title>
-    <!-- Tải Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
-    <!-- Cấu hình Tailwind -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary': '#007bff', // Màu xanh dương chủ đạo
-                        'secondary': '#6c757d', // Màu xám phụ
-                        'accent': '#1e3a8a', // Xanh đậm cho chi tiết
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
+    <title>Profile: Đặng Huy Hoàng | AI Developer</title>
     <style>
-        /* Đảm bảo font Inter được áp dụng */
+        /* Thiết lập cơ bản */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7f7f7;
-            color: #1f2937;
+            font-family: 'Courier New', Courier, monospace; /* Font kiểu code */
+            background: linear-gradient(135deg, #000428, #004e92); /* Nền xanh AI */
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            overflow: hidden;
         }
-        .section-title {
-            position: relative;
-            padding-bottom: 0.5rem;
-        }
-        .section-title::after {
-            content: '';
+
+        /* Hiệu ứng nền trang trí */
+        .background-blur {
             position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 4px;
-            background-color: #007bff;
-            border-radius: 2px;
+            width: 300px;
+            height: 300px;
+            background: #f57224; /* FPT Orange */
+            filter: blur(150px);
+            opacity: 0.4;
+            z-index: 0;
         }
-        .author-card-bg {
-            background: linear-gradient(135deg, #1e3a8a 0%, #007bff 100%);
+
+        /* Thẻ Profile chính */
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px); /* Hiệu ứng kính mờ */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 50px 40px;
+            border-radius: 24px;
+            text-align: center;
+            width: 380px;
+            z-index: 1;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
+
+        /* Hình ảnh đại diện */
+        .profile-img-container {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 20px;
+        }
+
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* Dấu tích xanh xác nhận */
+        .verified-badge {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: #00c6ff;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            border: 2px solid #004e92;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 1px;
+        }
+
+        .role {
+            color: #f57224; /* Màu cam FPT */
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .info-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 25px;
+            text-align: left;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+            border-bottom: 1px dashed rgba(255,255,255,0.2);
+            padding-bottom: 5px;
+        }
+
+        .info-item:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+
+        .label { color: #aaa; }
+        .value { font-weight: bold; color: #fff; }
+
+        .btn-connect {
+            margin-top: 25px;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 30px;
+            background: linear-gradient(90deg, #f57224, #ff9f43);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-connect:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(245, 114, 36, 0.6);
+        }
+
     </style>
 </head>
-<body class="antialiased">
+<body>
 
-    <!-- Header / Navigation -->
-    <header class="bg-white shadow-md sticky top-0 z-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <a href="#" class="text-2xl font-bold text-accent">AI Insights</a>
-            <nav class="hidden md:flex space-x-8">
-                <a href="#hero" class="text-gray-600 hover:text-primary transition duration-300">Tổng quan</a>
-                <a href="#features" class="text-gray-600 hover:text-primary transition duration-300">Tính năng</a>
-                <a href="#author" class="text-gray-600 hover:text-primary transition duration-300 font-semibold">Về Tác giả</a>
-            </nav>
-            <!-- Mobile Menu Button (Placeholder) -->
-            <button class="md:hidden text-gray-600 hover:text-primary focus:outline-none">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            </button>
+    <div class="background-blur"></div>
+
+    <div class="card">
+        <div class="profile-img-container">
+            <img src="https://via.placeholder.com/150" alt="Đặng Huy Hoàng" class="profile-img">
+            <div class="verified-badge">✓</div>
         </div>
-    </header>
 
-    <!-- Hero Section -->
-    <section id="hero" class="bg-gray-900 text-white py-20 md:py-32">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-4xl sm:text-6xl font-extrabold mb-4 leading-tight">
-                Trí Tuệ Nhân Tạo: Định Hình Tương Lai
-            </h1>
-            <p class="text-xl sm:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
-                Khám phá những tiến bộ đột phá, các ứng dụng thực tế và tiềm năng vô hạn của công nghệ AI.
-            </p>
-            <a href="#features" class="inline-block bg-primary hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
-                Bắt đầu khám phá
-            </a>
-        </div>
-    </section>
+        <h2>Đặng Huy Hoàng</h2>
+        <span class="role">&lt;AI Developer /&gt;</span>
 
-    <!-- Features Section -->
-    <section id="features" class="py-16 md:py-24 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 section-title">Các Khía Cạnh Đột Phá của AI</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-                <!-- Feature 1 -->
-                <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 border border-gray-100">
-                    <div class="flex items-center justify-center w-12 h-12 bg-primary/20 text-primary rounded-full mb-4">
-                        <!-- Icon: Machine Learning -->
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3 text-accent">Học Máy (Machine Learning)</h3>
-                    <p class="text-gray-600">
-                        Nền tảng của AI hiện đại, cho phép các hệ thống học hỏi từ dữ liệu, nhận dạng mẫu và đưa ra dự đoán mà không cần lập trình rõ ràng.
-                    </p>
-                </div>
-
-                <!-- Feature 2 -->
-                <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 border border-gray-100">
-                    <div class="flex items-center justify-center w-12 h-12 bg-primary/20 text-primary rounded-full mb-4">
-                        <!-- Icon: Computer Vision -->
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.55 4.55a2 2 0 010 2.83l-4.55 4.55a2 2 0 01-2.83 0l-4.55-4.55a2 2 0 010-2.83l4.55-4.55a2 2 0 012.83 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l-3 3M15 17l3-3"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3 text-accent">Thị Giác Máy Tính (Vision)</h3>
-                    <p class="text-gray-600">
-                        Giúp máy tính "nhìn" và hiểu thế giới trực quan, ứng dụng trong xe tự lái, nhận dạng khuôn mặt và kiểm tra chất lượng sản phẩm.
-                    </p>
-                </div>
-
-                <!-- Feature 3 -->
-                <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 border border-gray-100">
-                    <div class="flex items-center justify-center w-12 h-12 bg-primary/20 text-primary rounded-full mb-4">
-                        <!-- Icon: NLP -->
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h10M7 16h6M17 21v-7a2 2 0 00-2-2H9a2 2 0 00-2 2v7"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3 text-accent">Xử Lý Ngôn Ngữ Tự Nhiên (NLP)</h3>
-                    <p class="text-gray-600">
-                        Cho phép máy tính giao tiếp, đọc hiểu, dịch và tạo ra ngôn ngữ tự nhiên, là cốt lõi của chatbot và trợ lý ảo.
-                    </p>
-                </div>
+        <div class="info-box">
+            <div class="info-item">
+                <span class="label">MSSV</span>
+                <span class="value">PK04652</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Trường</span>
+                <span class="value">FPT Polytechnic</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Khu vực</span>
+                <span class="value">Buôn Ma Thuột</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Chuyên môn</span>
+                <span class="value">Machine Learning</span>
             </div>
         </div>
-    </section>
 
-    <!-- About Author Section -->
-    <section id="author" class="py-16 md:py-24 bg-gray-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 section-title">Về Tác giả Website</h2>
-            
-            <div class="max-w-2xl mx-auto author-card-bg p-8 md:p-12 rounded-2xl shadow-xl text-white">
-                <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
-                    
-                    <!-- Profile Image -->
-                    <div class="flex-shrink-0">
-                        <!-- Placeholder Image - Thay thế bằng hình ảnh thật của bạn (dùng link URL) -->
-                        <!-- Kích thước 150x150, nền xanh đậm, chữ trắng -->
-                        <img src="https://placehold.co/150x150/1e3a8a/ffffff?text=Profile+Image" 
-                             alt="Hình ảnh đại diện Đặng Huy Hoàng"
-                             class="w-36 h-36 rounded-full border-4 border-white object-cover shadow-lg">
-                    </div>
+        <button class="btn-connect" onclick="alert('Đang kết nối với Huy Hoàng...')">Liên Hệ Ngay</button>
+    </div>
 
-                    <!-- Author Details -->
-                    <div class="flex-grow text-center md:text-left">
-                        <h3 class="text-3xl font-bold mb-2">Đặng Huy Hoàng</h3>
-                        <p class="text-xl font-medium text-blue-200 mb-4">Chuyên gia phát triển AI (Tương lai)</p>
-                        
-                        <div class="space-y-2 text-lg">
-                            <p>
-                                <span class="font-semibold text-blue-100">Trường:</span> FPT Polytechnic
-                            </p>
-                            <p>
-                                <span class="font-semibold text-blue-100">Mã số sinh viên:</span> PK04652
-                            </p>
-                            <p>
-                                <span class="font-semibold text-blue-100">Cơ sở:</span> Thành phố Buôn Mê Thuật
-                            </p>
-                        </div>
-
-                        <p class="mt-6 text-gray-200 italic">
-                            "Với niềm đam mê công nghệ và Trí tuệ Nhân tạo, tôi mong muốn tạo ra những giải pháp kỹ thuật tiên tiến, góp phần vào sự phát triển của cộng đồng và ngành công nghiệp 4.0."
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p>&copy; 2024 AI Insights. Trang web được tạo bởi Đặng Huy Hoàng.</p>
-            <div class="mt-2 text-sm text-gray-400">
-                Sinh viên FPT Polytechnic - PK04652
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        // Smooth scrolling cho các liên kết điều hướng
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-    </script>
 </body>
 </html>

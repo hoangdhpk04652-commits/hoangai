@@ -1,596 +1,618 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Search, User, Settings, BarChart2, FileText, 
-  Shield, Upload, Globe, Bell, Menu, X, Cpu, 
-  Database, Layout, Image as ImageIcon, LogOut 
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Công Nghệ AI - Khám phá Tương lai & Tra cứu</title>
+    <!-- SEO OPTIMIZATION -->
+    <meta name="description" content="Khám phá và tra cứu thông tin AI mới nhất bằng công cụ tìm kiếm tích hợp Google Gemini. Website giới thiệu bởi Đặng Huy Hoàng, sinh viên FPT Polytechnic Buôn Mê Thuật (PK04652).">
+    <meta name="keywords" content="AI, Trí tuệ Nhân tạo, Công nghệ, FPT Polytechnic, Buôn Mê Thuật, Đặng Huy Hoàng, Tra cứu AI, Gemini API, CMS, SEO, Quản trị">
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <!-- Cấu hình Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#007bff', // Màu xanh dương chủ đạo
+                        'secondary': '#6c757d', // Màu xám phụ
+                        'accent': '#1e3a8a', // Xanh đậm cho chi tiết
+                        'success': '#10b981', // Màu xanh lá cho báo cáo tốt
+                        'warning': '#f59e0b', // Màu vàng cho cảnh báo
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Đảm bảo font Inter được áp dụng và thêm Transition cho UX */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+            color: #1f2937;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        /* Mock Dark Mode Styles (UX Enhancement) */
+        .dark-mode {
+            background-color: #1a202c; 
+            color: #f7fafc; 
+        }
+        .dark-mode .section-title::after {
+            background-color: #4299e1; 
+        }
+        .dark-mode .bg-white, .dark-mode .bg-gray-50, .dark-mode .bg-gray-100 {
+            background-color: #2d3748; 
+            color: #f7fafc;
+        }
+        .dark-mode .bg-gray-200 {
+            background-color: #1a202c;
+        }
+        .dark-mode .text-gray-600, .dark-mode .text-gray-700 {
+            color: #cbd5e0;
+        }
+        .dark-mode .text-gray-500 {
+            color: #a0aec0;
+        }
+        .dark-mode .author-card-bg {
+             background: linear-gradient(135deg, #007bff 0%, #1e3a8a 100%);
+        }
+        /* End Mock Dark Mode Styles */
 
-/* PROJECT: AI TECH PORTFOLIO & CMS SYSTEM
-  OWNER: Đặng Huy Hoàng - PK04652
-  SCHOOL: FPT Polytechnic - Buôn Ma Thuột
-*/
+        .section-title {
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background-color: #007bff;
+            border-radius: 2px;
+        }
+        .author-card-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #007bff 100%);
+        }
+        /* CSS cho chế độ chỉnh sửa CMS (Mock) */
+        .cms-active .editable-content {
+            border: 2px dashed #ef4444 !important; /* Màu đỏ cho dễ nhận biết */
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        .cms-active .editable-content:hover {
+            border-color: #f87171 !important;
+        }
+    </style>
+</head>
+<body class="antialiased">
 
-export default function AITechPortfolio() {
-  const [currentView, setCurrentView] = useState('home'); // home, search, admin
-  const [userRole, setUserRole] = useState('guest'); // guest, admin, editor
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  // --- MOCK DATA ---
-  const profile = {
-    name: "Đặng Huy Hoàng",
-    id: "PK04652",
-    school: "FPT Polytechnic",
-    location: "TP. Buôn Ma Thuột",
-    role: "AI Engineer & Fullstack Developer",
-    avatar: "https://ui-avatars.com/api/?name=Huy+Hoang&background=0ea5e9&color=fff"
-  };
-
-  // --- HANDLERS ---
-  const toggleRole = () => {
-    setUserRole(prev => prev === 'admin' ? 'guest' : 'admin');
-    if (userRole === 'admin') setCurrentView('home'); // Nếu thoát admin thì về home
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans flex overflow-hidden selection:bg-cyan-500 selection:text-white">
-      
-      {/* SIDEBAR NAVIGATION */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0`}>
-        <div className="p-6 flex items-center justify-center border-b border-slate-800">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg shadow-cyan-500/20">
-              <Cpu size={24} />
+    <!-- Header / Navigation -->
+    <header class="bg-white shadow-md sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-accent">AI Insights</a>
+            <div class="flex items-center space-x-6">
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#hero" class="text-gray-600 hover:text-primary transition duration-300">Tổng quan</a>
+                    <a href="#lookup" class="text-gray-600 hover:text-primary transition duration-300">Tra cứu AI</a>
+                    <a href="#testimonials" class="text-gray-600 hover:text-primary transition duration-300">Nhận định</a>
+                    <a href="#author" class="text-gray-600 hover:text-primary transition duration-300">Về Tác giả</a>
+                    <!-- Admin Link -->
+                    <a href="#admin-panel" class="text-primary hover:text-accent transition duration-300 font-bold">Quản trị</a>
+                </nav>
+                
+                <!-- Mock Role Display (Phân quyền) -->
+                <span class="text-sm font-medium text-success bg-success/10 px-3 py-1 rounded-full border border-success/50 hidden lg:inline-block" id="user-role-mock">
+                    Vai trò: Admin (PK04652)
+                </span>
+                
+                <!-- Mobile Menu Button (Placeholder) -->
+                <button class="md:hidden text-gray-600 hover:text-primary focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
             </div>
-            <div>
-              <h1 className="font-bold text-lg tracking-wider text-white">HOANG<span className="text-cyan-400">.AI</span></h1>
-              <p className="text-[10px] text-slate-500 uppercase tracking-widest">System PK04652</p>
-            </div>
-          </div>
         </div>
+    </header>
 
-        <nav className="mt-8 px-4 space-y-2">
-          <NavItem icon={Layout} label="Trang chủ" active={currentView === 'home'} onClick={() => setCurrentView('home')} />
-          <NavItem icon={Search} label="Tra cứu AI" active={currentView === 'search'} onClick={() => setCurrentView('search')} />
-          
-          <div className="pt-6 pb-2 pl-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Hệ thống</div>
-          
-          {userRole === 'admin' ? (
-            <>
-              <NavItem icon={BarChart2} label="Dashboard & Thống kê" active={currentView === 'admin_stats'} onClick={() => setCurrentView('admin_stats')} />
-              <NavItem icon={FileText} label="Quản trị nội dung (CMS)" active={currentView === 'admin_cms'} onClick={() => setCurrentView('admin_cms')} />
-              <NavItem icon={Globe} label="Cấu hình SEO" active={currentView === 'admin_seo'} onClick={() => setCurrentView('admin_seo')} />
-              <NavItem icon={Shield} label="Phân quyền User" active={currentView === 'admin_users'} onClick={() => setCurrentView('admin_users')} />
-            </>
-          ) : (
-            <div className="px-4 py-3 bg-slate-800/50 rounded-lg border border-slate-700 text-xs text-slate-400">
-              <p className="mb-2">Bạn đang xem với tư cách Khách.</p>
-              <button onClick={toggleRole} className="text-cyan-400 hover:underline">Đăng nhập Admin</button>
-            </div>
-          )}
-        </nav>
-
-        <div className="absolute bottom-0 w-full p-4 border-t border-slate-800">
-          <div className="flex items-center gap-3 p-2 rounded-lg bg-slate-800/50">
-            <img src={profile.avatar} alt="Avatar" className="w-8 h-8 rounded-full border border-cyan-500" />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">{profile.name}</p>
-              <p className="text-xs text-slate-500 truncate">{userRole === 'admin' ? 'Super Admin' : 'Guest Viewer'}</p>
-            </div>
-            <button onClick={toggleRole} className="p-1 hover:text-red-400 transition-colors" title="Chuyển vai trò">
-              <LogOut size={16} />
-            </button>
-          </div>
-        </div>
-      </aside>
-
-      {/* MAIN CONTENT */}
-      <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
-        {/* MOBILE HEADER */}
-        <header className="md:hidden h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 z-40">
-          <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="text-slate-400">
-            {isSidebarOpen ? <X /> : <Menu />}
-          </button>
-          <span className="font-bold text-white">HOANG.AI</span>
-          <div className="w-8"></div>
-        </header>
-
-        <div className="flex-1 overflow-y-auto bg-slate-950 p-4 md:p-8 scroll-smooth">
-          {/* VIEW SWITCHER */}
-          {currentView === 'home' && <HomeView profile={profile} onSearchClick={() => setCurrentView('search')} />}
-          {currentView === 'search' && <AISearchView profile={profile} />}
-          
-          {/* ADMIN VIEWS */}
-          {userRole === 'admin' && (
-            <>
-              {currentView === 'admin_stats' && <AdminStatsView />}
-              {currentView === 'admin_cms' && <AdminCMSView />}
-              {currentView === 'admin_seo' && <AdminSEOView />}
-              {currentView === 'admin_users' && <AdminUsersView />}
-            </>
-          )}
-
-          {/* Fallback if user is guest but tries to access admin */}
-          {userRole !== 'admin' && currentView.startsWith('admin') && (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <Shield size={64} className="text-red-500 mb-4" />
-              <h2 className="text-2xl font-bold text-white">Truy cập bị từ chối</h2>
-              <p className="text-slate-400 mt-2">Bạn cần quyền Admin để truy cập khu vực này.</p>
-              <button onClick={toggleRole} className="mt-6 px-6 py-2 bg-cyan-600 text-white rounded-full hover:bg-cyan-500 transition-all">
-                Chuyển sang chế độ Admin (Demo)
-              </button>
-            </div>
-          )}
-        </div>
-      </main>
-
-    </div>
-  );
-}
-
-/* --- COMPONENTS --- */
-
-function NavItem({ icon: Icon, label, active, onClick }) {
-  return (
-    <button 
-      onClick={onClick}
-      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 
-        ${active 
-          ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.15)]' 
-          : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
-    >
-      <Icon size={18} />
-      <span>{label}</span>
-    </button>
-  );
-}
-
-/* --- VIEW: HOME --- */
-function HomeView({ profile, onSearchClick }) {
-  return (
-    <div className="max-w-4xl mx-auto pt-10 animate-fadeIn">
-      {/* Hero Profile */}
-      <div className="relative mb-16">
-        <div className="absolute -top-20 -left-20 w-64 h-64 bg-cyan-500/20 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
-        <div className="absolute top-20 -right-20 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl opacity-30 pointer-events-none"></div>
-
-        <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-12">
-          <div className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt"></div>
-            <img 
-              src={profile.avatar} 
-              alt="Profile" 
-              className="relative w-40 h-40 rounded-full object-cover border-4 border-slate-900 shadow-2xl"
-            />
-            <div className="absolute bottom-2 right-2 bg-green-500 w-4 h-4 rounded-full border-2 border-slate-900"></div>
-          </div>
-
-          <div className="text-center md:text-left">
-            <div className="inline-block px-3 py-1 mb-3 text-xs font-semibold tracking-wider text-cyan-400 uppercase bg-cyan-500/10 rounded-full border border-cyan-500/20">
-              FPT Polytechnic Student
-            </div>
-            <h1 className="text-4xl md:text-6xl font-black text-white mb-2 tracking-tight">
-              {profile.name}
+    <!-- Hero Section -->
+    <section id="hero" class="bg-gray-900 text-white py-20 md:py-32">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl sm:text-6xl font-extrabold mb-4 leading-tight editable-content" data-cms="hero-title">
+                Trí Tuệ Nhân Tạo: Định Hình Tương Lai
             </h1>
-            <p className="text-xl text-slate-400 mb-6 font-light">{profile.id} • {profile.location}</p>
-            <p className="text-slate-300 max-w-lg leading-relaxed mb-8">
-              Chuyên gia phát triển Website & Công nghệ AI. Đam mê xây dựng các hệ thống thông minh, tối ưu trải nghiệm người dùng và tích hợp công nghệ tương lai.
+            <p class="text-xl sm:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto editable-content" data-cms="hero-subtitle">
+                Khám phá những tiến bộ đột phá, các ứng dụng thực tế và tiềm năng vô hạn của công nghệ AI.
             </p>
-            
-            <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-              <button onClick={onSearchClick} className="px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transform hover:-translate-y-1 transition-all flex items-center gap-2">
-                <Search size={20} />
-                Tra cứu thông tin AI
-              </button>
-              <button className="px-8 py-3 bg-slate-800 text-white font-semibold rounded-xl border border-slate-700 hover:bg-slate-700 transition-all">
-                Xem CV chi tiết
-              </button>
-            </div>
-          </div>
+            <a href="#lookup" class="inline-block bg-primary hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
+                Tra cứu thông tin AI ngay
+            </a>
         </div>
-      </div>
+    </section>
 
-      {/* Features Showcase */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <FeatureCard 
-          icon={Cpu} 
-          title="AI Integration" 
-          desc="Tích hợp trí tuệ nhân tạo để phân tích dữ liệu và trả lời tự động." 
-          color="cyan"
-        />
-        <FeatureCard 
-          icon={Layout} 
-          title="Modern UI/UX" 
-          desc="Thiết kế giao diện người dùng tối ưu, chuẩn responsive trên mọi thiết bị." 
-          color="purple"
-        />
-        <FeatureCard 
-          icon={Database} 
-          title="Smart CMS" 
-          desc="Hệ thống quản trị nội dung mạnh mẽ, bảo mật và dễ sử dụng." 
-          color="emerald"
-        />
-      </div>
-    </div>
-  );
-}
+    <!-- AI Lookup Section -->
+    <section id="lookup" class="py-16 md:py-24 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 section-title">Tra Cứu Thông Tin AI & Công Nghệ</h2>
 
-function FeatureCard({ icon: Icon, title, desc, color }) {
-  const colors = {
-    cyan: "text-cyan-400 bg-cyan-400/10 border-cyan-400/20",
-    purple: "text-purple-400 bg-purple-400/10 border-purple-400/20",
-    emerald: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20",
-  };
-  return (
-    <div className={`p-6 rounded-2xl border ${colors[color].split(' ')[2]} bg-slate-900/50 backdrop-blur-sm hover:bg-slate-800 transition-colors`}>
-      <div className={`w-12 h-12 rounded-lg ${colors[color]} flex items-center justify-center mb-4`}>
-        <Icon size={24} />
-      </div>
-      <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
-      <p className="text-sm text-slate-400 leading-relaxed">{desc}</p>
-    </div>
-  );
-}
-
-/* --- VIEW: AI SEARCH --- */
-function AISearchView({ profile }) {
-  const [query, setQuery] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
-  const [messages, setMessages] = useState([
-    { type: 'ai', content: `Xin chào! Tôi là trợ lý AI của ${profile.name}. Tôi có thể giúp bạn tra cứu thông tin gì về công nghệ, hoặc về hồ sơ của tác giả?` }
-  ]);
-  const endRef = useRef(null);
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (!query.trim()) return;
-
-    // Add user message
-    const newMsgs = [...messages, { type: 'user', content: query }];
-    setMessages(newMsgs);
-    setQuery('');
-    setIsSearching(true);
-
-    // Simulate AI response
-    setTimeout(() => {
-      let response = "Tôi đã tìm thấy thông tin liên quan trên hệ thống dữ liệu FPT Polytechnic.";
-      
-      if (query.toLowerCase().includes('đặng huy hoàng') || query.includes('pk04652')) {
-        response = `**Kết quả tra cứu hồ sơ:**\n- Họ tên: Đặng Huy Hoàng\n- MSSV: PK04652\n- Chuyên ngành: Ứng dụng phần mềm / AI\n- GPA: 3.8/4.0 (Giả định)\n- Dự án tiêu biểu: AI Portfolio System.`;
-      } else if (query.toLowerCase().includes('seo') || query.includes('cms')) {
-        response = "Hệ thống CMS của website này được tích hợp module SEO tự động, cho phép tùy chỉnh thẻ Meta Title, Description và Open Graph tags để tối ưu hóa hiển thị trên Google và Facebook.";
-      } else {
-        response = `Dựa trên từ khóa "${query}", AI đề xuất các tài liệu sau:\n1. Giáo trình AI cơ bản (PDF)\n2. Hướng dẫn ReactJS cho người mới bắt đầu\n3. Cấu trúc dữ liệu và giải thuật.\n\nBạn có muốn tải xuống không?`;
-      }
-
-      setMessages(prev => [...prev, { type: 'ai', content: response }]);
-      setIsSearching(false);
-    }, 1500);
-  };
-
-  useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  return (
-    <div className="max-w-3xl mx-auto h-[calc(100vh-100px)] flex flex-col">
-      <div className="flex-1 overflow-y-auto space-y-4 p-4 scrollbar-hide">
-        {messages.map((msg, idx) => (
-          <div key={idx} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[80%] p-4 rounded-2xl ${
-              msg.type === 'user' 
-                ? 'bg-cyan-600 text-white rounded-br-none' 
-                : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none'
-            }`}>
-              {msg.type === 'ai' && <div className="flex items-center gap-2 mb-2 text-cyan-400 text-xs font-bold uppercase"><Cpu size={12}/> AI System</div>}
-              <div className="whitespace-pre-line text-sm leading-relaxed">{msg.content}</div>
+            <!-- Input Form -->
+            <div class="bg-gray-100 p-6 rounded-xl shadow-inner mb-8">
+                <label for="query" class="block text-lg font-semibold mb-2 text-accent">Nhập câu hỏi của bạn về AI:</label>
+                <!-- Tra cứu AI luôn có sẵn cho người dùng và admin -->
+                <textarea id="query" rows="3" class="w-full p-4 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150" placeholder="Ví dụ: Công nghệ AI mới nhất là gì?"></textarea>
+                <button onclick="fetchAiContent()" class="mt-4 w-full md:w-auto bg-primary hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-300 transform hover:scale-[1.01]">
+                    Tra Cứu (Sử dụng Google Gemini)
+                </button>
             </div>
-          </div>
-        ))}
-        {isSearching && (
-          <div className="flex justify-start">
-            <div className="bg-slate-800 p-4 rounded-2xl rounded-bl-none border border-slate-700 flex gap-2 items-center text-slate-400 text-sm">
-              <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce"></span>
-              <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce delay-100"></span>
-              <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce delay-200"></span>
-              Đang phân tích dữ liệu...
-            </div>
-          </div>
-        )}
-        <div ref={endRef}></div>
-      </div>
 
-      <div className="p-4 bg-slate-900 border-t border-slate-800">
-        <form onSubmit={handleSearch} className="relative">
-          <input 
-            type="text" 
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Nhập câu hỏi để tra cứu..." 
-            className="w-full bg-slate-950 border border-slate-700 text-white rounded-xl py-4 pl-5 pr-12 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
-          />
-          <button type="submit" disabled={!query.trim() || isSearching} className="absolute right-3 top-3 p-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-500 disabled:opacity-50 disabled:hover:bg-cyan-600 transition-colors">
-            <ArrowRightIcon />
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-function ArrowRightIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-  )
-}
-
-/* --- VIEW: ADMIN STATS (Báo cáo & Thống kê) --- */
-function AdminStatsView() {
-  return (
-    <div className="space-y-6 max-w-5xl mx-auto">
-      <div className="flex justify-between items-end">
-        <div>
-          <h2 className="text-2xl font-bold text-white">Dashboard Tổng quan</h2>
-          <p className="text-slate-400 text-sm">Cập nhật lần cuối: Vừa xong</p>
-        </div>
-        <button className="px-4 py-2 bg-slate-800 text-slate-300 text-sm rounded-lg hover:bg-slate-700">Xuất báo cáo PDF</button>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard title="Tổng truy cập" value="12,450" change="+12%" icon={User} color="blue" />
-        <StatCard title="Tìm kiếm AI" value="3,210" change="+24%" icon={Search} color="cyan" />
-        <StatCard title="Thời gian trang" value="4m 32s" change="+5%" icon={ClockIcon} color="green" />
-        <StatCard title="Tỷ lệ thoát" value="24.5%" change="-2%" icon={LogOut} color="red" />
-      </div>
-
-      {/* Chart Simulation */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-6">
-          <h3 className="font-bold text-white mb-6 flex items-center gap-2">
-            <BarChart2 size={18} className="text-cyan-400"/> Biểu đồ truy cập (7 ngày qua)
-          </h3>
-          <div className="h-64 flex items-end justify-between gap-2">
-            {[40, 65, 45, 80, 55, 90, 75].map((h, i) => (
-              <div key={i} className="w-full bg-slate-800 rounded-t-lg relative group hover:bg-cyan-900/50 transition-colors">
-                <div 
-                  className="absolute bottom-0 left-0 right-0 bg-cyan-500/80 rounded-t-lg mx-1 transition-all duration-500 group-hover:bg-cyan-400"
-                  style={{ height: `${h}%` }}
-                ></div>
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-slate-900 text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                  {h * 10}
+            <!-- Results Display -->
+            <div id="results" class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 min-h-[200px] flex flex-col justify-center items-center">
+                <div id="loading" class="hidden text-center">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-3"></div>
+                    <p class="text-primary font-medium">Đang tìm kiếm thông tin mới nhất...</p>
                 </div>
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-between mt-4 text-xs text-slate-500 font-mono">
-            <span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span>CN</span>
-          </div>
+                <div id="content-display" class="w-full hidden">
+                    <h3 class="text-2xl font-bold text-accent mb-4 border-b pb-2">Kết Quả Tra Cứu</h3>
+                    <div id="generated-text" class="text-gray-700 leading-relaxed space-y-4"></div>
+                    
+                    <!-- Citations will be added here -->
+                    <div id="citations" class="mt-6 pt-4 border-t border-gray-200"></div>
+                </div>
+                <p id="initial-message" class="text-gray-500 italic">Kết quả tra cứu sẽ hiển thị ở đây.</p>
+            </div>
+
         </div>
+    </section>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-          <h3 className="font-bold text-white mb-4">Thiết bị truy cập</h3>
-          <div className="space-y-4">
-            <ProgressBar label="Mobile" percent={65} color="bg-purple-500" />
-            <ProgressBar label="Desktop" percent={30} color="bg-cyan-500" />
-            <ProgressBar label="Tablet" percent={5} color="bg-orange-500" />
-          </div>
-          
-          <div className="mt-8 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
-            <h4 className="text-sm font-bold text-white mb-2">Gợi ý AI Optimization</h4>
-            <p className="text-xs text-slate-400">Lượng truy cập Mobile tăng cao. Cần tối ưu hóa tốc độ tải trang và giao diện Search trên màn hình nhỏ.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+    <!-- Features Section -->
+    <section id="features" class="py-16 md:py-24 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 section-title">Các Khía Cạnh Đột Phá của AI</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-function StatCard({ title, value, change, icon: Icon, color }) {
-  const colors = {
-    blue: "text-blue-400 bg-blue-400/10",
-    cyan: "text-cyan-400 bg-cyan-400/10",
-    green: "text-emerald-400 bg-emerald-400/10",
-    red: "text-rose-400 bg-rose-400/10",
-  };
-  return (
-    <div className="bg-slate-900 border border-slate-800 p-5 rounded-xl hover:border-slate-700 transition-all">
-      <div className="flex justify-between items-start mb-4">
-        <div className={`p-2 rounded-lg ${colors[color]}`}>
-          <Icon size={20} />
-        </div>
-        <span className={`text-xs font-bold px-2 py-1 rounded-full ${change.startsWith('+') ? 'text-emerald-400 bg-emerald-400/10' : 'text-rose-400 bg-rose-400/10'}`}>
-          {change}
-        </span>
-      </div>
-      <h3 className="text-2xl font-bold text-white">{value}</h3>
-      <p className="text-sm text-slate-500">{title}</p>
-    </div>
-  );
-}
+                <!-- Feature 1: Machine Learning -->
+                <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 border border-gray-100 editable-content" data-cms="feature-1">
+                    <div class="flex items-center justify-center w-12 h-12 bg-primary/20 text-primary rounded-full mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3 text-accent">Học Máy (Machine Learning)</h3>
+                    <p class="text-gray-600">Nền tảng của AI hiện đại, cho phép các hệ thống học hỏi từ dữ liệu, nhận dạng mẫu và đưa ra dự đoán mà không cần lập trình rõ ràng.</p>
+                </div>
 
-function ProgressBar({ label, percent, color }) {
-  return (
-    <div>
-      <div className="flex justify-between text-xs mb-1">
-        <span className="text-slate-300">{label}</span>
-        <span className="text-slate-400">{percent}%</span>
-      </div>
-      <div className="w-full bg-slate-800 rounded-full h-2">
-        <div className={`h-2 rounded-full ${color}`} style={{ width: `${percent}%` }}></div>
-      </div>
-    </div>
-  );
-}
+                <!-- Feature 2: Computer Vision -->
+                <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 border border-gray-100 editable-content" data-cms="feature-2">
+                    <div class="flex items-center justify-center w-12 h-12 bg-primary/20 text-primary rounded-full mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.55 4.55a2 2 0 010 2.83l-4.55 4.55a2 2 0 01-2.83 0l-4.55-4.55a2 2 0 010-2.83l4.55-4.55a2 2 0 012.83 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l-3 3M15 17l3-3"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3 text-accent">Thị Giác Máy Tính (Vision)</h3>
+                    <p class="text-gray-600">Giúp máy tính "nhìn" và hiểu thế giới trực quan, ứng dụng trong xe tự lái, nhận dạng khuôn mặt và kiểm tra chất lượng sản phẩm.</p>
+                </div>
 
-function ClockIcon({size}) {
-   return <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-}
-
-/* --- VIEW: ADMIN CMS (Quản trị nội dung) --- */
-function AdminCMSView() {
-  return (
-    <div className="max-w-4xl mx-auto space-y-8">
-       <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-white">Quản lý nội dung (CMS)</h2>
-          <button className="flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-sm font-medium transition-colors">
-            <Upload size={16} /> Thêm bài viết mới
-          </button>
-        </div>
-
-        <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-800/50 text-slate-400 uppercase text-xs">
-              <tr>
-                <th className="px-6 py-4">Tiêu đề</th>
-                <th className="px-6 py-4">Trạng thái</th>
-                <th className="px-6 py-4">Tác giả</th>
-                <th className="px-6 py-4">Ngày đăng</th>
-                <th className="px-6 py-4 text-right">Hành động</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800">
-              <CMSRow title="Giới thiệu về Đặng Huy Hoàng" status="Published" author="HoangAdmin" date="12/10/2023" />
-              <CMSRow title="Xu hướng AI năm 2024" status="Draft" author="Editor01" date="15/10/2023" />
-              <CMSRow title="FPT Polytechnic - Môi trường học tập" status="Published" author="HoangAdmin" date="20/10/2023" />
-              <CMSRow title="Cách tích hợp API vào Website" status="Review" author="Editor02" date="22/10/2023" />
-            </tbody>
-          </table>
-        </div>
-
-        {/* Media Upload Section Simulation */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 border-dashed border-2 border-slate-700 hover:border-cyan-500/50 transition-colors cursor-pointer group">
-            <div className="flex flex-col items-center justify-center py-8">
-              <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4 group-hover:bg-slate-700 transition-colors">
-                <ImageIcon size={32} className="text-slate-400 group-hover:text-cyan-400" />
-              </div>
-              <h3 className="text-lg font-medium text-white mb-2">Tải lên Logo hoặc Hình ảnh</h3>
-              <p className="text-slate-500 text-sm max-w-sm text-center">Kéo thả file vào đây hoặc click để chọn từ máy tính. Hỗ trợ JPG, PNG, WEBP (Max 5MB).</p>
+                <!-- Feature 3: NLP -->
+                <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 border border-gray-100 editable-content" data-cms="feature-3">
+                    <div class="flex items-center justify-center w-12 h-12 bg-primary/20 text-primary rounded-full mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h10M7 16h6M17 21v-7a2 2 0 00-2-2H9a2 2 0 00-2 2v7"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3 text-accent">Xử Lý Ngôn Ngữ Tự Nhiên (NLP)</h3>
+                    <p class="text-gray-600">Cho phép máy tính giao tiếp, đọc hiểu, dịch và tạo ra ngôn ngữ tự nhiên, là cốt lõi của chatbot và trợ lý ảo.</p>
+                </div>
             </div>
         </div>
-    </div>
-  );
-}
+    </section>
 
-function CMSRow({ title, status, author, date }) {
-  const statusStyles = {
-    Published: "bg-emerald-400/10 text-emerald-400 border-emerald-400/20",
-    Draft: "bg-slate-700 text-slate-300 border-slate-600",
-    Review: "bg-yellow-400/10 text-yellow-400 border-yellow-400/20"
-  };
-  return (
-    <tr className="hover:bg-slate-800/50 transition-colors">
-      <td className="px-6 py-4 font-medium text-white">{title}</td>
-      <td className="px-6 py-4">
-        <span className={`text-xs px-2 py-1 rounded border ${statusStyles[status]}`}>{status}</span>
-      </td>
-      <td className="px-6 py-4 text-slate-400">{author}</td>
-      <td className="px-6 py-4 text-slate-500">{date}</td>
-      <td className="px-6 py-4 text-right">
-        <button className="text-cyan-400 hover:text-cyan-300 mr-3">Edit</button>
-        <button className="text-rose-400 hover:text-rose-300">Delete</button>
-      </td>
-    </tr>
-  );
-}
+    <!-- Testimonials/Quotes Section -->
+    <section id="testimonials" class="py-16 md:py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 section-title">Nhận Định & Trích Dẫn về AI</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Quote 1 -->
+                <div class="bg-gray-50 p-6 rounded-xl shadow-md border-t-4 border-primary/50 editable-content" data-cms="quote-1">
+                    <p class="italic text-gray-700 mb-4">"AI sẽ không thay thế con người, nhưng những người sử dụng AI sẽ thay thế những người không sử dụng."</p>
+                    <div class="font-semibold text-accent">- Jensen Huang, CEO NVIDIA</div>
+                </div>
 
-/* --- VIEW: ADMIN SEO (Tối ưu hóa tìm kiếm) --- */
-function AdminSEOView() {
-  return (
-    <div className="max-w-3xl mx-auto">
-      <h2 className="text-2xl font-bold text-white mb-6">Cấu hình SEO (Search Engine Optimization)</h2>
-      
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-6">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-300">Meta Title</label>
-          <div className="flex gap-2">
-             <input type="text" defaultValue="Đặng Huy Hoàng | AI Engineer & Portfolio" className="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-cyan-500 outline-none" />
-             <span className="text-xs text-emerald-400 flex items-center">Tốt (60 chars)</span>
-          </div>
-        </div>
+                <!-- Quote 2 -->
+                <div class="bg-gray-50 p-6 rounded-xl shadow-md border-t-4 border-primary/50 editable-content" data-cms="quote-2">
+                    <p class="italic text-gray-700 mb-4">"Bất kỳ tổ chức nào cố gắng tối ưu hóa dựa trên dữ liệu mà không sử dụng AI, đều đang tối ưu hóa một cách kém hiệu quả."</p>
+                    <div class="font-semibold text-accent">- Andrew Ng, Lãnh đạo AI</div>
+                </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-300">Meta Description</label>
-          <textarea rows="3" defaultValue="Trang web cá nhân của Đặng Huy Hoàng (PK04652) - Sinh viên FPT Polytechnic. Chuyên về phát triển AI, Web App và giải pháp công nghệ tại Buôn Ma Thuột." className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-cyan-500 outline-none"></textarea>
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-300">Keywords</label>
-          <input type="text" defaultValue="AI, Portfolio, FPT Polytechnic, Đặng Huy Hoàng, PK04652, Web Developer" className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-cyan-500 outline-none" />
-        </div>
-
-        <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm text-slate-400">
-               <div className="w-3 h-3 rounded-full bg-emerald-500"></div> Sitemap.xml đang hoạt động
+                <!-- Quote 3 -->
+                <div class="bg-gray-50 p-6 rounded-xl shadow-md border-t-4 border-primary/50 editable-content" data-cms="quote-3">
+                    <p class="italic text-gray-700 mb-4">"Tương lai của AI không phải là tạo ra một siêu trí tuệ, mà là tạo ra một công cụ hỗ trợ cho con người."</p>
+                    <div class="font-semibold text-accent">- Yann LeCun, Trưởng nhóm AI tại Meta</div>
+                </div>
             </div>
-            <button className="px-6 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-500 font-medium">Lưu cấu hình</button>
         </div>
-      </div>
-      
-      {/* Google Preview Simulation */}
-      <div className="mt-8">
-        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Xem trước kết quả tìm kiếm (Google)</h3>
-        <div className="bg-white p-4 rounded-xl max-w-2xl border-l-4 border-blue-500">
-            <div className="flex items-center gap-2 mb-1">
-                <div className="w-6 h-6 bg-slate-200 rounded-full flex items-center justify-center text-xs text-slate-600">H</div>
-                <div className="text-sm text-slate-800">hoangai-portfolio.com › profile</div>
-                <div className="text-xs text-slate-500">▼</div>
-            </div>
-            <h3 className="text-xl text-blue-800 hover:underline cursor-pointer font-medium truncate">Đặng Huy Hoàng | AI Engineer & Portfolio</h3>
-            <p className="text-sm text-slate-600 mt-1 line-clamp-2">
-              Trang web cá nhân của <b>Đặng Huy Hoàng (PK04652)</b> - Sinh viên FPT Polytechnic. Chuyên về phát triển AI, Web App và giải pháp công nghệ tại Buôn Ma Thuột...
-            </p>
-        </div>
-      </div>
-    </div>
-  );
-}
+    </section>
 
-/* --- VIEW: ADMIN USERS (Phân quyền) --- */
-function AdminUsersView() {
-  return (
-    <div className="max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold text-white mb-6">Quản lý người dùng & Phân quyền</h2>
-      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-        <table className="w-full text-left text-sm">
-           <thead className="bg-slate-800/50 text-slate-400 uppercase text-xs">
-              <tr>
-                <th className="px-6 py-4">User</th>
-                <th className="px-6 py-4">Email</th>
-                <th className="px-6 py-4">Vai trò</th>
-                <th className="px-6 py-4">Trạng thái</th>
-                <th className="px-6 py-4 text-right">Actions</th>
-              </tr>
-           </thead>
-           <tbody className="divide-y divide-slate-800">
-              <tr>
-                <td className="px-6 py-4 flex items-center gap-3">
-                   <div className="w-8 h-8 rounded-full bg-cyan-500 flex items-center justify-center text-white font-bold">H</div>
-                   <span className="font-bold text-white">Đặng Huy Hoàng</span>
-                </td>
-                <td className="px-6 py-4 text-slate-400">hoangpk04652@fpt.edu.vn</td>
-                <td className="px-6 py-4"><span className="px-2 py-1 rounded bg-purple-500/10 text-purple-400 text-xs border border-purple-500/20 font-bold">Super Admin</span></td>
-                <td className="px-6 py-4 text-emerald-400 text-xs">● Online</td>
-                <td className="px-6 py-4 text-right text-slate-500">Locked</td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 flex items-center gap-3">
-                   <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-white font-bold">T</div>
-                   <span className="text-slate-200">Test Editor</span>
-                </td>
-                <td className="px-6 py-4 text-slate-400">editor@demo.com</td>
-                <td className="px-6 py-4">
-                  <select className="bg-slate-950 border border-slate-700 text-slate-300 text-xs rounded px-2 py-1 outline-none focus:border-cyan-500">
-                    <option>Editor</option>
-                    <option>Viewer</option>
-                  </select>
-                </td>
-                <td className="px-6 py-4 text-slate-500 text-xs">● Offline</td>
-                <td className="px-6 py-4 text-right"><button className="text-rose-400 hover:text-rose-300">Xóa</button></td>
-              </tr>
-           </tbody>
-        </table>
-      </div>
-      <p className="mt-4 text-slate-500 text-xs">* Super Admin có quyền truy cập toàn bộ hệ thống CMS, SEO và Analytics.</p>
-    </div>
-  );
-}
+    <!-- About Author Section -->
+    <section id="author" class="py-16 md:py-24 bg-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 section-title">Về Tác giả Website</h2>
+            
+            <div class="max-w-2xl mx-auto author-card-bg p-8 md:p-12 rounded-2xl shadow-xl text-white">
+                <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
+                    
+                    <!-- Profile Image / Logo -->
+                    <div class="flex-shrink-0">
+                        <!-- HÌNH ẢNH PROFILE: Placeholder cho logo trường FPT Poly hoặc ảnh profile -->
+                        <img id="profile-image" src="https://placehold.co/150x150/1e3a8a/ffffff?text=FPT+Poly" 
+                             alt="Hình ảnh đại diện/Logo Đặng Huy Hoàng"
+                             class="w-36 h-36 rounded-full border-4 border-white object-cover shadow-lg">
+                    </div>
+
+                    <!-- Author Details -->
+                    <div class="flex-grow text-center md:text-left">
+                        <h3 class="text-3xl font-bold mb-2">Đặng Huy Hoàng</h3>
+                        <p class="text-xl font-medium text-blue-200 mb-4">Sinh viên Công nghệ Thông tin</p>
+                        
+                        <div class="space-y-2 text-lg">
+                            <p>
+                                <span class="font-semibold text-blue-100">Trường:</span> FPT Polytechnic
+                            </p>
+                            <p>
+                                <span class="font-semibold text-blue-100">Mã số sinh viên:</span> PK04652
+                            </p>
+                            <p>
+                                <span class="font-semibold text-blue-100">Cơ sở:</span> Thành phố Buôn Mê Thuật
+                            </p>
+                        </div>
+
+                        <p class="mt-6 text-gray-200 italic editable-content" data-cms="author-quote">
+                            "Với niềm đam mê công nghệ và Trí tuệ Nhân tạo, tôi mong muốn tạo ra những giải pháp kỹ thuật tiên tiến, góp phần vào sự phát triển của cộng đồng và ngành công nghiệp 4.0."
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Panel Section (CMS, SEO, Thống kê, Phân quyền Mock-up) -->
+    <section id="admin-panel" class="py-16 md:py-24 bg-gray-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 section-title text-white">Bảng Điều Khiển Quản Trị (Admin Mock-up)</h2>
+
+            <!-- 1. CÔNG CỤ TÙY CHỈNH (UX/CMS Mock) -->
+            <div class="bg-gray-800 p-6 rounded-xl shadow-lg mb-8 border-l-4 border-primary">
+                <h3 class="text-2xl font-semibold text-primary mb-4">Tùy chỉnh Giao diện & Nội dung (CMS)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Chế độ Chỉnh sửa CMS -->
+                    <div class="flex items-center space-x-4 bg-gray-700 p-4 rounded-lg">
+                        <label for="editModeToggle" class="text-white font-medium flex-grow">Chế độ Chỉnh sửa CMS (Mock):</label>
+                        <button id="editModeToggle" class="relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 bg-gray-400" role="switch" aria-checked="false" onclick="toggleEditModeMock()">
+                            <span aria-hidden="true" class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 translate-x-0"></span>
+                        </button>
+                    </div>
+                    
+                    <!-- Chế độ tối (Dark Mode) -->
+                    <div class="flex items-center space-x-4 bg-gray-700 p-4 rounded-lg">
+                        <label for="themeToggle" class="text-white font-medium flex-grow">Chế độ tối (Dark Mode) (UX):</label>
+                        <button id="themeToggle" class="relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary bg-gray-400" role="switch" aria-checked="false" onclick="toggleThemeMock()">
+                            <span aria-hidden="true" class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 translate-x-0"></span>
+                        </button>
+                    </div>
+
+                    <!-- Quản lý Nội dung Bài viết (Mock) -->
+                    <button onclick="console.log('Mock: Đã mở giao diện Quản lý Bài viết & Danh mục')" class="col-span-1 md:col-span-2 bg-gray-600 hover:bg-primary transition duration-300 text-white font-bold py-3 px-4 rounded-lg">
+                        Quản lý Bài viết & Danh mục (Dễ dàng cập nhật)
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. BÁO CÁO & THỐNG KÊ (Mock) -->
+            <div class="bg-gray-800 p-6 rounded-xl shadow-lg mb-8 border-l-4 border-success">
+                <h3 class="text-2xl font-semibold text-success mb-4">Báo cáo & Thống kê Truy cập (Mock)</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                    
+                    <!-- Metric 1: Tổng truy cập -->
+                    <div class="bg-gray-700 p-4 rounded-lg">
+                        <p class="text-3xl font-bold text-white">4,890</p>
+                        <p class="text-sm text-gray-400">Tổng Truy Cập Tháng</p>
+                    </div>
+                    
+                    <!-- Metric 2: Tỷ lệ thoát -->
+                    <div class="bg-gray-700 p-4 rounded-lg">
+                        <p class="text-3xl font-bold text-warning">28.5%</p>
+                        <p class="text-sm text-gray-400">Tỷ Lệ Thoát (Hành vi người dùng)</p>
+                    </div>
+
+                    <!-- Metric 3: Tốc độ tải trang (UX) -->
+                    <div class="bg-gray-700 p-4 rounded-lg">
+                        <p class="text-3xl font-bold text-success">1.5s</p>
+                        <p class="text-sm text-gray-400">Tốc Độ Tải Trang (SEO & UX)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. TỐI ƯU HÓA CÔNG CỤ TÌM KIẾM (SEO Mock) -->
+            <div class="bg-gray-800 p-6 rounded-xl shadow-lg mb-8 border-l-4 border-warning">
+                <h3 class="text-2xl font-semibold text-warning mb-4">Tối ưu hóa Công cụ Tìm kiếm (SEO)</h3>
+                <div class="space-y-3">
+                    <p class="text-lg font-semibold flex justify-between items-center">
+                        Điểm SEO Chung: 
+                        <span class="bg-success text-white text-sm font-bold px-3 py-1 rounded-full">Tốt (92/100)</span>
+                    </p>
+                    <p>
+                        <span class="font-medium text-gray-300">Cấu trúc URL:</span> Đã tối ưu (Thân thiện, không ID phức tạp)
+                    </p>
+                    <p>
+                        <span class="font-medium text-gray-300">Thẻ Meta/Mô tả:</span> Đã đầy đủ và đúng chuẩn
+                    </p>
+                    <div class="flex space-x-4">
+                        <button onclick="console.log('Mock: Đang tạo lại Sitemap.xml...')" class="text-primary hover:underline">Tạo lại Sitemap.xml</button>
+                        <button onclick="console.log('Mock: Đã kiểm tra Robots.txt thành công')" class="text-primary hover:underline">Kiểm tra Robots.txt</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. PHÂN QUYỀN NGƯỜI DÙNG (Mock) -->
+            <div class="bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-accent">
+                <h3 class="text-2xl font-semibold text-accent mb-4">Quản lý Phân quyền Người dùng (Mock)</h3>
+                <table class="w-full text-left table-auto">
+                    <thead>
+                        <tr class="text-gray-400 border-b border-gray-700">
+                            <th class="py-2">Tên</th>
+                            <th class="py-2">MSSV/ID</th>
+                            <th class="py-2">Vai trò</th>
+                            <th class="py-2">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Vai trò Admin (Đặng Huy Hoàng) -->
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3">Đặng Huy Hoàng</td>
+                            <td class="py-3">PK04652</td>
+                            <td class="py-3"><span class="bg-success text-white px-3 py-1 text-xs rounded-full">Admin</span></td>
+                            <td class="py-3"><button onclick="console.log('Mock: Đã mở hồ sơ PK04652 để chỉnh sửa quyền')" class="text-primary hover:text-blue-400">Chỉnh sửa</button></td>
+                        </tr>
+                        <!-- Vai trò Editor -->
+                        <tr>
+                            <td class="py-3">User Test</td>
+                            <td class="py-3">ED99999</td>
+                            <td class="py-3"><span class="bg-warning text-gray-800 px-3 py-1 text-xs rounded-full">Editor</span></td>
+                            <td class="py-3"><button onclick="console.log('Mock: Đã mở hồ sơ ED99999 để chỉnh sửa quyền')" class="text-primary hover:text-blue-400">Chỉnh sửa</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </section>
+    <!-- END: Admin Panel Section -->
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2024 AI Insights. Trang web được tạo bởi Đặng Huy Hoàng.</p>
+            <div class="mt-2 text-sm text-gray-400">
+                Sinh viên FPT Polytechnic - PK04652
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Hàm chuyển đổi Markdown sang HTML (đơn giản)
+        function markdownToHtml(markdown) {
+            // Chuyển đổi tiêu đề h3
+            markdown = markdown.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+            // Chuyển đổi tiêu đề h2
+            markdown = markdown.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+            // Chuyển đổi in đậm
+            markdown = markdown.replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>');
+            // Chuyển đổi đoạn văn bản
+            markdown = markdown.replace(/\n/g, '<br>');
+            return markdown;
+        }
+
+        // Hàm gọi API Gemini
+        async function fetchAiContent() {
+            const queryElement = document.getElementById('query');
+            const generatedTextElement = document.getElementById('generated-text');
+            const citationsElement = document.getElementById('citations');
+            const loadingElement = document.getElementById('loading');
+            const contentDisplayElement = document.getElementById('content-display');
+            const initialMessageElement = document.getElementById('initial-message');
+            
+            const userQuery = queryElement.value.trim();
+            if (!userQuery) return; // Không làm gì nếu query rỗng
+
+            // Ẩn nội dung cũ, hiển thị loading
+            initialMessageElement.classList.add('hidden');
+            contentDisplayElement.classList.add('hidden');
+            loadingElement.classList.remove('hidden');
+            generatedTextElement.innerHTML = '';
+            citationsElement.innerHTML = '';
+
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+            // Tạo payload với Google Search Grounding
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                // Bật Google Search để tra cứu thông tin mới nhất
+                tools: [{ "google_search": {} }],
+                // Định hướng phản hồi
+                systemInstruction: {
+                    parts: [{ text: "Act as a helpful and informative AI expert. Provide a detailed, easy-to-understand explanation in Vietnamese, ensuring the information is current and accurate." }]
+                },
+            };
+
+            const maxRetries = 3;
+            let currentRetry = 0;
+            let response;
+            let result;
+
+            // Thực hiện gọi API với Exponential Backoff
+            while (currentRetry < maxRetries) {
+                try {
+                    response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 429) { // Rate limit or transient error
+                            throw new Error('API Rate Limit Exceeded or Temporary Error');
+                        }
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    result = await response.json();
+                    break; // Thành công, thoát vòng lặp
+                } catch (error) {
+                    console.error("API call failed:", error);
+                    currentRetry++;
+                    if (currentRetry >= maxRetries) {
+                        // Thất bại sau khi retry
+                        generatedTextElement.innerHTML = '<p class="text-red-600">Xin lỗi, không thể tra cứu thông tin AI lúc này. Vui lòng thử lại sau.</p>';
+                        loadingElement.classList.add('hidden');
+                        contentDisplayElement.classList.remove('hidden');
+                        return;
+                    }
+                    // Chờ đợi trước khi retry (1s, 2s, 4s)
+                    const delay = Math.pow(2, currentRetry) * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+
+            // Xử lý kết quả
+            const candidate = result?.candidates?.[0];
+            
+            loadingElement.classList.add('hidden');
+
+            if (candidate && candidate.content?.parts?.[0]?.text) {
+                const text = candidate.content.parts[0].text;
+                
+                // Hiển thị văn bản kết quả
+                generatedTextElement.innerHTML = markdownToHtml(text);
+                
+                // Xử lý nguồn trích dẫn (Citations)
+                let sources = [];
+                const groundingMetadata = candidate.groundingMetadata;
+                if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                    sources = groundingMetadata.groundingAttributions
+                        .map(attribution => ({
+                            uri: attribution.web?.uri,
+                            title: attribution.web?.title,
+                        }))
+                        .filter(source => source.uri && source.title);
+                }
+
+                if (sources.length > 0) {
+                    citationsElement.innerHTML = '<p class="font-semibold text-sm text-gray-500 mb-2">Nguồn trích dẫn:</p>';
+                    const ul = document.createElement('ul');
+                    ul.className = 'list-disc list-inside text-sm text-gray-600 space-y-1';
+                    sources.forEach((source) => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<a href="${source.uri}" target="_blank" class="text-primary hover:underline">${source.title}</a>`;
+                        ul.appendChild(li);
+                    });
+                    citationsElement.appendChild(ul);
+                } else {
+                    citationsElement.innerHTML = '<p class="text-sm text-gray-500 italic">Không có nguồn trích dẫn cụ thể được tìm thấy.</p>';
+                }
+
+                contentDisplayElement.classList.remove('hidden');
+                queryElement.value = ''; // Xóa query sau khi thành công
+
+            } else {
+                generatedTextElement.innerHTML = '<p class="text-red-600">Không thể tạo câu trả lời cho câu hỏi của bạn. Vui lòng thử lại với một câu hỏi khác.</p>';
+                contentDisplayElement.classList.remove('hidden');
+            }
+        }
+
+        // Mock function for theme toggling (UX/Quản trị)
+        function toggleThemeMock() {
+            const body = document.body;
+            const toggleButton = document.getElementById('themeToggle');
+            const isDarkMode = body.classList.toggle('dark-mode'); 
+
+            if (isDarkMode) {
+                toggleButton.classList.remove('bg-gray-400');
+                toggleButton.classList.add('bg-primary');
+                toggleButton.children[0].classList.remove('translate-x-0');
+                toggleButton.children[0].classList.add('translate-x-5');
+                console.log("Mock Dark Mode ON - Tùy chỉnh UX được áp dụng");
+            } else {
+                toggleButton.classList.remove('bg-primary');
+                toggleButton.classList.add('bg-gray-400');
+                toggleButton.children[0].classList.remove('translate-x-5');
+                toggleButton.children[0].classList.add('translate-x-0');
+                console.log("Mock Dark Mode OFF - Trở về giao diện mặc định");
+            }
+        }
+
+        // Mock function for CMS Edit Mode Toggling (Chức năng quản trị CMS)
+        function toggleEditModeMock() {
+            const body = document.body;
+            const editButton = document.getElementById('editModeToggle');
+            const isEditing = editButton.getAttribute('aria-checked') === 'false';
+
+            const adminRole = document.getElementById('user-role-mock');
+
+            if (isEditing) {
+                // Chỉ cho phép chế độ chỉnh sửa nếu vai trò là Admin (Mock)
+                if (adminRole && adminRole.textContent.includes('Admin')) {
+                    body.classList.add('cms-active');
+                    editButton.setAttribute('aria-checked', 'true');
+                    editButton.classList.remove('bg-gray-400');
+                    editButton.classList.add('bg-red-500');
+                    editButton.children[0].classList.remove('translate-x-0');
+                    editButton.children[0].classList.add('translate-x-5');
+                    
+                    // Thêm event listener để mô phỏng chỉnh sửa trực tiếp
+                    document.querySelectorAll('.editable-content').forEach(el => {
+                        el.onclick = function() {
+                            const newContent = prompt(`Chỉnh sửa nội dung cho ${el.dataset.cms}:`, el.textContent.trim());
+                            if (newContent !== null) {
+                                el.textContent = newContent;
+                                console.log(`Mock CMS: Nội dung "${el.dataset.cms}" đã được cập nhật.`);
+                            }
+                        };
+                    });
+
+                    console.log("Mock CMS Edit Mode ON. Click vào các khu vực nội dung viền đỏ để chỉnh sửa.");
+                } else {
+                     console.log("Mock CMS: Chỉ Admin mới có quyền chỉnh sửa.");
+                }
+            } else {
+                body.classList.remove('cms-active');
+                editButton.setAttribute('aria-checked', 'false');
+                editButton.classList.remove('bg-red-500');
+                editButton.classList.add('bg-gray-400');
+                editButton.children[0].classList.remove('translate-x-5');
+                editButton.children[0].classList.add('translate-x-0');
+
+                // Xóa event listener
+                document.querySelectorAll('.editable-content').forEach(el => {
+                    el.onclick = null;
+                });
+
+                console.log("Mock CMS Edit Mode OFF. Nội dung đã trở về chế độ xem.");
+            }
+        }
+
+        // Smooth scrolling cho các liên kết điều hướng
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
